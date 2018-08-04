@@ -6,10 +6,11 @@ function random(a, b){
 }
 
 function loadResource(name){
+  let time = random(200, 8000);
   return new Promise(resolve => {
     setTimeout(() => {
       resolve("Resource result: " + name);
-    }, random(200, 8000));
+    }, time);
   });
 }
 
