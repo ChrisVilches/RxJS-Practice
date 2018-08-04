@@ -24,10 +24,10 @@ let resources = [
 // Emits every downloaded resource
 let completedValues$ = from(resources)
 .pipe(
-  mergeMap(x => {
-    return from(x.promise).pipe(startWith(x.weight), pairwise())
+  mergeMap(r => {
+    return from(r.promise).pipe(startWith(r.weight), pairwise())
   }),
-  map(x => x[0])
+  map(r => r[0])
 );
 
 // Emits the accumulated sum of every downloaded resource
