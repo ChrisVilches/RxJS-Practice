@@ -26,7 +26,7 @@ let sequence = [
 let results$ = applySequence(sequence, 10);
 
 results$.subscribe(
-  console.log,
+  value => { console.log("Current value: " + value) },
   error => console.log
 );
 
