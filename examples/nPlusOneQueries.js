@@ -10,7 +10,7 @@ function query(i){
   let promise = new Promise(resolve => {
     setTimeout(() => {
       console.log("Query finished.");
-      resolve(i * 100)
+      resolve(i * 100);
     }, random(500, 1500));
   });
 
