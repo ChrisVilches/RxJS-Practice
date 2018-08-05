@@ -1,11 +1,9 @@
 const { from, of, zip } = require('rxjs');
 const { map, mergeMap, scan, merge, pairwise, startWith } = require('rxjs/operators');
-
-function random(a, b){
-  return Math.floor(a + (Math.random() * (b-a)));
-}
+const { random } = require('./util');
 
 function loadResource(name){
+  console.log("Loading " + name + "...");
   let time = random(200, 8000);
   return new Promise(resolve => {
     setTimeout(() => {
