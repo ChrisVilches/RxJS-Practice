@@ -1,5 +1,5 @@
-const { from, of, interval, Subject, empty } = require('rxjs');
-const { map, mergeMap, scan, merge, pairwise, combineAll, last, concat, switchMap, mergeAll, concatAll, startWith, concatMap, delay, take, mapTo } = require('rxjs/operators');
+const { from, interval } = require('rxjs');
+const { startWith, switchMap, take, map, concatAll } = require('rxjs/operators');
 
 function createTask(name, duration){
   return () => {
@@ -13,39 +13,28 @@ function createTask(name, duration){
 
 function doSequentially(tasks, wait){
 
-  let oneEmptyWait$ = interval(wait).pipe(take(1), mergeMap(() => empty()));
+  let firstTask$ = from(tasks[0]());
+
+  tasks.shift(); // Remove first task
 
   return from(tasks)
-
   .pipe(
-    mergeMap(t => from([t, oneEmptyWait$]))
-  )
-
-  .pipe(
-
-    concatMap(x => {
-
-      if(typeof x === "function"){
-        return x();
-      }
-
-      return x;
-
-    })
+    map(t => interval(wait).pipe(take(1), switchMap(x => t()))),
+    startWith(firstTask$),
+    concatAll()
   );
-
 }
 
 
 let result$ = doSequentially([
   createTask("A", 200),
-  createTask("B", 200),
+  createTask("B", 2000),
   createTask("C", 200),
   createTask("D", 200),
   createTask("E", 200),
   createTask("F", 200),
   createTask("G", 200)
-], 1000);
+], 3000);
 
 result$.subscribe(
   result => {
