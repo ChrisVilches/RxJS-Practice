@@ -1,5 +1,5 @@
-const { from, of } = require('rxjs');
-const { pairwise, startWith, delay, mergeMap } = require('rxjs/operators');
+const { from, of, Subject } = require('rxjs');
+const { pairwise, startWith, delay, mergeMap, last, switchMap } = require('rxjs/operators');
 
 /*
 * The user presses a button, which triggers an async action.
@@ -7,24 +7,27 @@ const { pairwise, startWith, delay, mergeMap } = require('rxjs/operators');
 * triggers a different action, and must cancel the previous one.
 */
 
-function loadHomePage(){
+function loadHomePage(n){
   return new Promise(resolve => {
-    setTimeout(resolve, 2000, "Home page");
+    setTimeout(resolve, 2000, "Home page " + n);
   });
 }
 
 function loadSettings(){
   return new Promise(resolve => {
-    setTimeout(resolve, 5000, "Settings page");
+    setTimeout(resolve, 5000, "Settings page " + n);
   });
 }
 
 
-let a$ = from(loadSettings());
-let subsription = a$.subscribe(console.log);
+let subject = new Subject();
+let observable$ = from(subject).pipe(switchMap(x => from(x)));
+observable$.subscribe(console.log);
 
-setTimeout(() => {
-  subsription.unsubscribe();
-  a$ = from(loadHomePage());
-  a$.subscribe(console.log);
-}, 500);
+subject.next(loadSettings(1));
+subject.next(loadHomePage(2));
+subject.next(loadSettings(3));
+subject.next(loadSettings(4));
+subject.next(loadSettings(5));
+subject.next(loadSettings(6));
+subject.next(loadHomePage(7)); // Only this one remains
