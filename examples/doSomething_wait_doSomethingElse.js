@@ -1,7 +1,6 @@
 const { from, of, interval } = require('rxjs');
 const { map, mergeMap, scan, merge, pairwise, startWith, concatMap, delay, take, mapTo } = require('rxjs/operators');
 
-
 function createTask(name, duration){
   return () => {
     console.log("Executing " + name + "...");
@@ -24,7 +23,7 @@ function doSequentially(fn1, fn2, wait){
   return fn1$.pipe(merge(fn2$));
 }
 
-doSequentially(createTask("A", 1000), createTask("B", 1000), 2000).subscribe(
+doSequentially(createTask("A", 2000), createTask("B", 2000), 1000).subscribe(
   result => {
     console.log("Result:", result);
   }
