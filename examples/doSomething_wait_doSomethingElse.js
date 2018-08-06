@@ -1,5 +1,5 @@
 const { of, from, interval } = require('rxjs');
-const { startWith, switchMap, take, map, concatAll, mergeAll, combineAll, concat, merge } = require('rxjs/operators');
+const { switchMap, take, map, concatAll, merge } = require('rxjs/operators');
 
 function createTask(name, duration){
   return () => {
@@ -26,7 +26,7 @@ function doSequentially(tasks, wait){
 
 
 let result$ = doSequentially([
-  createTask("A", 200),
+  createTask("A", 1500),
   createTask("B", 500),
   createTask("C", 200),
   createTask("D", 1000),
