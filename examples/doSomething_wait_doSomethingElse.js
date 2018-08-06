@@ -1,30 +1,55 @@
-const { from, of, interval } = require('rxjs');
-const { map, mergeMap, scan, merge, pairwise, startWith, concatMap, delay, take, mapTo } = require('rxjs/operators');
+const { from, of, interval, Subject, empty } = require('rxjs');
+const { map, mergeMap, scan, merge, pairwise, combineAll, last, concat, switchMap, mergeAll, concatAll, startWith, concatMap, delay, take, mapTo } = require('rxjs/operators');
 
 function createTask(name, duration){
   return () => {
     console.log("Executing " + name + "...");
     return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(name + " done");
-      }, duration);
+      setTimeout(resolve, duration, name + " done");
     });
   }
 }
 
-function doSequentially(fn1, fn2, wait){
 
-  let fn1$ = of(fn1()).pipe(mergeMap(fn => from(fn)));
+function doSequentially(tasks, wait){
 
-  let wait$ = fn1$.pipe(delay(wait));
+  let oneEmptyWait$ = interval(wait).pipe(take(1), mergeMap(() => empty()));
 
-  let fn2$ = wait$.pipe(mergeMap(() => fn2()));
+  return from(tasks)
 
-  return fn1$.pipe(merge(fn2$));
+  .pipe(
+    mergeMap(t => from([t, oneEmptyWait$]))
+  )
+
+  .pipe(
+
+    concatMap(x => {
+
+      if(typeof x === "function"){
+        return x();
+      }
+
+      return x;
+
+    })
+  );
+
 }
 
-doSequentially(createTask("A", 2000), createTask("B", 2000), 1000).subscribe(
+
+let result$ = doSequentially([
+  createTask("A", 200),
+  createTask("B", 200),
+  createTask("C", 200),
+  createTask("D", 200),
+  createTask("E", 200),
+  createTask("F", 200),
+  createTask("G", 200)
+], 1000);
+
+result$.subscribe(
   result => {
     console.log("Result:", result);
+    console.log();
   }
 );
