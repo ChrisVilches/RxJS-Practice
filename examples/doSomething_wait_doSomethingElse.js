@@ -1,5 +1,5 @@
-const { from, interval } = require('rxjs');
-const { startWith, switchMap, take, map, concatAll } = require('rxjs/operators');
+const { of, from, interval } = require('rxjs');
+const { startWith, switchMap, take, map, concatAll, mergeAll, combineAll, concat, merge } = require('rxjs/operators');
 
 function createTask(name, duration){
   return () => {
@@ -17,22 +17,21 @@ function doSequentially(tasks, wait){
 
   tasks.shift(); // Remove first task
 
-  return from(tasks)
-  .pipe(
-    map(t => interval(wait).pipe(take(1), switchMap(x => t()))),
-    startWith(firstTask$),
-    concatAll()
-  );
+  let otherTasks$ = from(tasks)
+  .pipe(map(t => interval(wait).pipe(take(1), switchMap(x => t()))));
+
+  return of(firstTask$).pipe(merge(otherTasks$), concatAll());
+
 }
 
 
 let result$ = doSequentially([
   createTask("A", 200),
-  createTask("B", 2000),
+  createTask("B", 500),
   createTask("C", 200),
-  createTask("D", 200),
-  createTask("E", 200),
-  createTask("F", 200),
+  createTask("D", 1000),
+  createTask("E", 100),
+  createTask("F", 800),
   createTask("G", 200)
 ], 3000);
 
