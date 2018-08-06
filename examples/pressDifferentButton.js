@@ -1,5 +1,5 @@
-const { from, of, Subject } = require('rxjs');
-const { pairwise, startWith, delay, mergeMap, last, switchMap } = require('rxjs/operators');
+const { from, Subject } = require('rxjs');
+const { switchMap } = require('rxjs/operators');
 
 /*
 * The user presses a button, which triggers an async action.

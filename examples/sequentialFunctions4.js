@@ -1,5 +1,5 @@
 const { of, from } = require('rxjs');
-const { mergeMap, map, last, flatMap } = require('rxjs/operators');
+const { mergeMap, map, last, mergeAll } = require('rxjs/operators');
 
 async function square(x){
   let result = await x * x;
@@ -32,7 +32,7 @@ function applySequence(sequence, firstNumber){
     obs$.push(newObs$);
   });
 
-  return from(obs$).pipe(flatMap(n => n));
+  return from(obs$).pipe(mergeAll());
 }
 
 
